@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.githubrepofinder.R
 import com.githubrepofinder.databinding.ItemRepositoryBinding
 import com.githubrepofinder.model.GHRepo
 
@@ -41,9 +42,9 @@ class RepositoryAdapter(private val onItemClick: (GHRepo) -> Unit) :
                 textId.text = repo.id.toString()
                 textName.text = repo.name
                 textOwner.text = repo.ownerLogin
-                textDescription.text = repo.description ?: "No description"
-                textLanguage.text = repo.language ?: "Unknown language"
-                textStars.text = "⭐ ${repo.stars}"
+                textDescription.text = repo.description ?: binding.root.context.getString(R.string.no_description)
+                textLanguage.text = repo.language ?: binding.root.context.getString(R.string.unknown_language)
+                textStars.text = binding.root.context.getString(R.string.stars_count, repo.stars)
             }
         }
     }
