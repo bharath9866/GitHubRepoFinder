@@ -20,18 +20,22 @@ class Cacher(private val repoDao: RepoDao) {
     suspend fun cacheRepositories(repoItems: List<RepoItem>) {
         withContext(Dispatchers.IO) {
             val ghRepos = repoItems.map { item ->
-                GHRepo(
-                    id = item.id,
-                    name = item.name,
-                    repoURL = item.htmlUrl,
-                    ownerLogin = item.owner.login,
-                    description = item.description,
-                    stars = item.stars,
-                    language = item.language
-                )
+                item.toGHRepo()
             }
             repoDao.insertAll(ghRepos)
         }
+    }
+
+    private fun RepoItem.toGHRepo(): GHRepo {
+        return GHRepo(
+            id = this.id,
+            name = this.name,
+            repoURL = this.htmlUrl,
+            ownerLogin = this.owner.login,
+            description = this.description,
+            stars = this.stars,
+            language = this.language
+        )
     }
 
     suspend fun clearCache() {

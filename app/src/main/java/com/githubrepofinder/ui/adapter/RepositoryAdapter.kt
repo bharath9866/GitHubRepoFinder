@@ -10,52 +10,44 @@ import com.githubrepofinder.databinding.ItemRepositoryBinding
 import com.githubrepofinder.model.GHRepo
 
 class RepositoryAdapter(private val onItemClick: (GHRepo) -> Unit) :
-    ListAdapter<GHRepo, RepositoryAdapter.ViewHolder>(RepoDiffCallback()) {
+    ListAdapter<GHRepo, RepositoryAdapter.RepositoryViewHolder>(RepoDiffCallback()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemRepositoryBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
-        return ViewHolder(binding)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RepositoryViewHolder {
+        val binding =
+            ItemRepositoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return RepositoryViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position))
+    override fun onBindViewHolder(holder: RepositoryViewHolder, position: Int) {
+        val repo = getItem(position)
+        holder.bind(repo)
     }
 
-    inner class ViewHolder(private val binding: ItemRepositoryBinding) :
+    inner class RepositoryViewHolder(private val binding: ItemRepositoryBinding) :
         RecyclerView.ViewHolder(binding.root) {
-
-        init {
-            binding.root.setOnClickListener {
-                val position = adapterPosition
-                if (position != RecyclerView.NO_POSITION) {
-                    onItemClick(getItem(position))
-                }
-            }
-        }
-
         fun bind(repo: GHRepo) {
             binding.apply {
                 textId.text = repo.id.toString()
                 textName.text = repo.name
                 textOwner.text = repo.ownerLogin
-                textDescription.text = repo.description ?: binding.root.context.getString(R.string.no_description)
-                textLanguage.text = repo.language ?: binding.root.context.getString(R.string.unknown_language)
-                textStars.text = binding.root.context.getString(R.string.stars_count, repo.stars)
+                textDescription.text =
+                    repo.description ?: root.context.getString(R.string.no_description)
+                textLanguage.text =
+                    repo.language ?: root.context.getString(R.string.unknown_language)
+                textStars.text = root.context.getString(R.string.stars_count, repo.stars)
+            }
+
+            binding.root.setOnClickListener {
+                onItemClick(repo)
             }
         }
     }
+}
 
-    private class RepoDiffCallback : DiffUtil.ItemCallback<GHRepo>() {
-        override fun areItemsTheSame(oldItem: GHRepo, newItem: GHRepo): Boolean {
-            return oldItem.id == newItem.id
-        }
+class RepoDiffCallback : DiffUtil.ItemCallback<GHRepo>() {
+    override fun areItemsTheSame(oldItem: GHRepo, newItem: GHRepo): Boolean =
+        oldItem.id == newItem.id
 
-        override fun areContentsTheSame(oldItem: GHRepo, newItem: GHRepo): Boolean {
-            return oldItem == newItem
-        }
-    }
+    override fun areContentsTheSame(oldItem: GHRepo, newItem: GHRepo): Boolean =
+        oldItem == newItem
 }

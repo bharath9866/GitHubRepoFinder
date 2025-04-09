@@ -18,38 +18,59 @@ class RepositoryViewModel(private val repository: GitHubRepository) : ViewModel(
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
 
-    // Get repositories from the database
+    /**
+     * LiveData containing all GitHub repositories from the local database
+     */
     val repositories: LiveData<List<GHRepo>> = repository.getAllRepositories()
 
-    // Search for repositories
+    /**
+     * Fetches repositories from the GitHub API based on the provided search query
+     * and updates the local database.
+     *
+     * @param query The search term to look for in GitHub repositories
+     */
     fun searchRepositories(query: String) {
         _isLoading.value = true
         _error.value = null
 
         viewModelScope.launch {
-            when (val result = repository.refreshRepositories(query)) {
-                is NetworkService.Result.Success -> {
-                    _isLoading.value = false
+            try {
+                when (val result = repository.refreshRepositories(query)) {
+                    is NetworkService.Result.Success -> {
+                        _isLoading.value = false
+                    }
+
+                    is NetworkService.Result.Error -> {
+                        _error.value = "Error loading repositories: ${result.exception.message}"
+                        _isLoading.value = false
+                    }
                 }
-                is NetworkService.Result.Error -> {
-                    _error.value = "Error loading repositories: ${result.exception.message}"
-                    _isLoading.value = false
-                }
+            } catch (e: Exception) {
+                _error.value = "Unexpected error: ${e.message}"
+                _isLoading.value = false
             }
         }
     }
 
-    // Search local repositories
+    /**
+     * Performs a local search on the cached repositories in the database
+     *
+     * @param query The search term to filter repositories
+     * @return LiveData list of repositories matching the query
+     */
     fun searchLocalRepositories(query: String): LiveData<List<GHRepo>> {
         return repository.searchLocalRepositories(query)
     }
 
-    // Clear error message
     fun clearError() {
         _error.value = null
     }
 
-    // Factory for creating the ViewModel with dependencies
+    /**
+     * Factory class for creating RepositoryViewModel instances with the required dependencies
+     *
+     * @property repository The repository implementation to inject into the ViewModel
+     */
     class Factory(private val repository: GitHubRepository) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(RepositoryViewModel::class.java)) {

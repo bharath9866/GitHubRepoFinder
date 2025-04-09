@@ -3,4 +3,8 @@
     <string name="no_description">No description</string>
     <string name="unknown_language">Unknown language</string>
     <string name="stars_count">⭐ %d</string>
+    <string name="no_repositories_found">No repositories found</string>
+    <string name="name">Name:</string>
+    <string name="id">ID:</string>
+    <string name="owner">Owner:</string>
 </resources>

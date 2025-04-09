@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    id("kotlin-kapt")
+    id("com.google.devtools.ksp") version libs.versions.ksp.get()
 }
 
 android {
@@ -40,52 +40,41 @@ android {
 }
 
 dependencies {
-
-    // Implementation dependencies
-    implementation(libs.appcompat)
+    // Core Android
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.androidx.constraintlayout)
 
-    // Build-In
-    implementation(libs.core.ktx)
-    implementation(libs.lifecycle.runtime.ktx)
+    // Room components
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
 
-    // Memory Card
-    implementation(libs.okhttp3.logging.interceptor)
-    implementation(libs.retrofit2.converter.gson)
-    implementation(libs.material)
+    // Lifecycle & ViewModel
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
 
+    // Retrofit for network calls
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging)
+
+    // Coroutines
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
+    // Flow API is part of kotlinx-coroutines-core, no need for separate dependency
 
-    implementation(libs.lifecycle.viewmodel.ktx)
-    implementation(libs.lifecycle.runtime.ktx)
+    // Paging for pagination support
+    implementation(libs.androidx.paging.runtime.ktx)
 
-    implementation(libs.navigation.fragment.ktx)
-    implementation(libs.navigation.ui.ktx)
+    // RecyclerView with DiffUtil for efficient updates
+    implementation(libs.androidx.recyclerview)
 
-    implementation(libs.activity.ktx)
-
-    implementation(libs.room.runtime)
-    kapt(libs.room.compiler)
-    implementation(libs.room.ktx)
-
-    implementation(libs.test.core)
+    // Testing
     testImplementation(libs.junit)
-    testImplementation(libs.hamcrest.all)
-    testImplementation(libs.arch.core.testing)
-    testImplementation(libs.robolectric)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.google.truth)
-    testImplementation(libs.mockito.core)
-    testImplementation("io.mockk:mockk:1.13.8")
-    testImplementation("org.jetbrains.kotlin:kotlin-test:1.9.0")
-
-    // Instrumented Unit Tests
-    androidTestImplementation(libs.junit)
-    androidTestImplementation(libs.kotlinx.coroutines.test)
-    androidTestImplementation(libs.arch.core.testing)
-    androidTestImplementation(libs.google.truth)
-    androidTestImplementation(libs.androidx.test.ext.junit)
-    androidTestImplementation(libs.androidx.test.espresso.core)
-    androidTestImplementation(libs.hilt.android.testing)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 }

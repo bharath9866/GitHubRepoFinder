@@ -4,29 +4,29 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="4dp">
+    android:layout_margin="@dimen/dimen_8dp"
+    app:cardCornerRadius="@dimen/dimen_8dp"
+    app:cardElevation="@dimen/dimen_4dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="@dimen/dimen_16dp">
 
         <TextView
             android:id="@+id/textIdLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ID:"
+            android:text="@string/id"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/textId"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/dimen_0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="@dimen/dimen_8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/textIdLabel"
             app:layout_constraintTop_toTopOf="@+id/textIdLabel"
@@ -36,39 +36,41 @@
             android:id="@+id/textNameLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Name:"
+            android:layout_marginTop="@dimen/dimen_8dp"
+            android:text="@string/name"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textIdLabel" />
 
         <TextView
             android:id="@+id/textName"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/dimen_0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:textSize="16sp"
+            android:layout_marginStart="@dimen/dimen_8dp"
+            android:textSize="@dimen/text_16sp"
             android:textStyle="bold"
+            android:maxLines="1"
+            android:ellipsize="end"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/textNameLabel"
             app:layout_constraintTop_toTopOf="@+id/textNameLabel"
-            tools:text="Sample Repository" />
+            tools:text="BaseApp-Jetpack-Compose-Android-KotlinBaseApp-Jetpack-Compose-Android-Kotlin" />
 
         <TextView
             android:id="@+id/textOwnerLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Owner:"
+            android:layout_marginTop="@dimen/dimen_8dp"
+            android:text="@string/owner"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textNameLabel" />
 
         <TextView
             android:id="@+id/textOwner"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/dimen_0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="@dimen/dimen_8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/textOwnerLabel"
             app:layout_constraintTop_toTopOf="@+id/textOwnerLabel"
@@ -76,9 +78,9 @@
 
         <TextView
             android:id="@+id/textDescription"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/dimen_0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/dimen_8dp"
             android:maxLines="2"
             android:ellipsize="end"
             app:layout_constraintEnd_toEndOf="parent"
@@ -90,7 +92,7 @@
             android:id="@+id/textLanguage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/dimen_8dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textDescription"
             tools:text="Kotlin" />
@@ -99,7 +101,7 @@
             android:id="@+id/textStars"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/dimen_8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textDescription"
             tools:text="⭐ 1234" />

@@ -12,9 +12,9 @@ import com.githubrepofinder.databinding.ActivityMainBinding
 import com.githubrepofinder.db.AppDatabase
 import com.githubrepofinder.network.NetworkService
 import com.githubrepofinder.repository.GitHubRepository
-import com.githubrepofinder.ui.WebViewActivity
 import com.githubrepofinder.ui.adapter.RepositoryAdapter
 import com.githubrepofinder.viewmodel.RepositoryViewModel
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -27,52 +27,69 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Initialize dependencies
+        initializeDependencies()
+        setupRecyclerView()
+        setupSearchView()
+        setupObservers()
+
+        // Load initial data with Kotlin repositories only if it's a fresh start
+        if (savedInstanceState == null) {
+            viewModel.searchRepositories("language:kotlin")
+        }
+    }
+
+    /**
+     * Initializes dependencies needed for the application.
+     * Sets up the database, network service, cacher, repository, and ViewModel.
+     */
+    private fun initializeDependencies() {
         val database = AppDatabase.getDatabase(applicationContext)
         val repoDao = database.repoDao()
         val networkService = NetworkService()
         val cacher = Cacher(repoDao)
         val repository = GitHubRepository(networkService, cacher)
 
-        // Initialize ViewModel
         viewModel = ViewModelProvider(this, RepositoryViewModel.Factory(repository))[RepositoryViewModel::class.java]
+    }
 
-        // Setup RecyclerView and Adapter
-        setupRecyclerView()
-        
-        // Observe data changes
-        observeViewModel()
 
-        // Initial search for repositories
+    private fun setupSearchView() {
+        /**
+         * - When search is submitted: Searches GitHub repositories using the API
+         * - When text changes: Filters local repositories or shows all repositories when empty
+         */
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let {
                     if (it.isNotEmpty()) {
                         viewModel.searchRepositories(it)
                     }
                 }
+                binding.searchView.clearFocus()
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 newText?.let {
                     if (it.isNotEmpty()) {
-                        observeLocalSearch(it)
+                        observeLocalRepositorySearch(it)
                     } else {
-                        observeViewModel()
+                        observeAllRepositories()
                     }
                 }
                 return true
             }
         })
-
-        // Initial data load
-        viewModel.searchRepositories("language:swift")
     }
 
+    /**
+     * Sets up the RecyclerView with an adapter and layout manager.
+     * Configures the click listener for repository items.
+     */
     private fun setupRecyclerView() {
         adapter = RepositoryAdapter { repo ->
-            // Navigate to WebView
+            // Launch WebView when a repository is clicked
             val intent = WebViewActivity.createIntent(this, repo.repoURL, repo.name)
             startActivity(intent)
         }
@@ -80,14 +97,15 @@ class MainActivity : AppCompatActivity() {
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = this@MainActivity.adapter
+            setHasFixedSize(true) // Optimization when we know item size doesn't change
         }
     }
 
-    private fun observeViewModel() {
-        viewModel.repositories.observe(this) { repos ->
-            adapter.submitList(repos)
-            binding.emptyView.visibility = if (repos.isEmpty()) View.VISIBLE else View.GONE
-        }
+    /**
+     * Sets up all observers for LiveData objects from ViewModel
+     */
+    private fun setupObservers() {
+        observeAllRepositories()
 
         viewModel.isLoading.observe(this) { isLoading ->
             binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
@@ -101,7 +119,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun observeLocalSearch(query: String) {
+    /**
+     * Observes LiveData from the ViewModel to update the UI when data changes.
+     */
+    private fun observeAllRepositories() {
+        viewModel.repositories.observe(this) { repos ->
+            adapter.submitList(repos)
+            binding.emptyView.visibility = if (repos.isEmpty()) View.VISIBLE else View.GONE
+        }
+    }
+
+    /**
+     * Observes local repository search results based on the provided query.
+     * Updates the UI with filtered repository data.
+     *
+     * @param query The search query string to filter repositories by
+     */
+    private fun observeLocalRepositorySearch(query: String) {
         viewModel.searchLocalRepositories(query).observe(this) { repos ->
             adapter.submitList(repos)
             binding.emptyView.visibility = if (repos.isEmpty()) View.VISIBLE else View.GONE
