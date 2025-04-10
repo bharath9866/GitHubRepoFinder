@@ -24,7 +24,7 @@ class GitHubRepository(
      *
      * @return LiveData object containing a list of GitHub repositories
      */
-    fun getAllRepositories(): LiveData<List<GHRepo>> {
+    private fun getAllRepositories(): LiveData<List<GHRepo>> {
         return cacher.getAllRepositories()
     }
 
@@ -34,7 +34,7 @@ class GitHubRepository(
      * @param query The search term to filter repositories
      * @return LiveData object containing a filtered list of GitHub repositories
      */
-    fun searchLocalRepositories(query: String): LiveData<List<GHRepo>> {
+    private fun searchLocalRepositories(query: String): LiveData<List<GHRepo>> {
         return cacher.searchRepositories(query)
     }
 

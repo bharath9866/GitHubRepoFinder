@@ -54,8 +54,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupSearchView() {
         /**
-         * - When search is submitted: Searches GitHub repositories using the API
-         * - When text changes: Filters local repositories or shows all repositories when empty
+         * Sets up the SearchView with query listeners.
+         * 
+         * The SearchView handles two types of user interactions:
+         * 1. Query Submission: When user submits a search query by pressing the search button
+         *    - If the query is non-empty, it triggers a network API call to search GitHub repositories
+         * 
+         * 2. Query Text Change: When user types or modifies text in the search field
+         *    - Instantly filters the currently loaded repositories based on the search text
+         *    - Shows all repositories when search text is empty
+         *    - This operation is performed locally and doesn't make network requests
+         *    - Provides real-time feedback as user types
          */
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
@@ -78,10 +87,6 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    /**
-     * Sets up the RecyclerView with an adapter and layout manager.
-     * Configures the click listener for repository items.
-     */
     private fun setupRecyclerView() {
         adapter = RepositoryAdapter { repo ->
             // Launch WebView when a repository is clicked
