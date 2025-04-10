@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.githubrepofinder.model.GHRepo
 import com.githubrepofinder.network.NetworkService
@@ -18,10 +19,22 @@ class RepositoryViewModel(private val repository: GitHubRepository) : ViewModel(
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
 
-    /**
-     * LiveData containing all GitHub repositories from the local database
-     */
-    val repositories: LiveData<List<GHRepo>> = repository.getAllRepositories()
+    // Query LiveData to trigger repository updates
+    private val _currentQuery = MutableLiveData<String>("")
+
+    // Transform the query into repository results automatically
+    val repositories: LiveData<List<GHRepo>> = _currentQuery.switchMap { query ->
+        repository.getRepositories(query)
+    }
+
+    init {
+        // Initial empty query
+        _currentQuery.value = ""
+    }
+
+    fun refreshRepositories(query: String) {
+        _currentQuery.value = query
+    }
 
     /**
      * Fetches repositories from the GitHub API based on the provided search query
@@ -37,6 +50,8 @@ class RepositoryViewModel(private val repository: GitHubRepository) : ViewModel(
             try {
                 when (val result = repository.refreshRepositories(query)) {
                     is NetworkService.Result.Success -> {
+                        // Update query to show only matching repositories
+                        _currentQuery.value = query
                         _isLoading.value = false
                     }
 
@@ -50,16 +65,6 @@ class RepositoryViewModel(private val repository: GitHubRepository) : ViewModel(
                 _isLoading.value = false
             }
         }
-    }
-
-    /**
-     * Performs a local search on the cached repositories in the database
-     *
-     * @param query The search term to filter repositories
-     * @return LiveData list of repositories matching the query
-     */
-    fun searchLocalRepositories(query: String): LiveData<List<GHRepo>> {
-        return repository.searchLocalRepositories(query)
     }
 
     fun clearError() {

@@ -15,7 +15,6 @@ import com.githubrepofinder.repository.GitHubRepository
 import com.githubrepofinder.ui.adapter.RepositoryAdapter
 import com.githubrepofinder.viewmodel.RepositoryViewModel
 
-
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -34,7 +33,7 @@ class MainActivity : AppCompatActivity() {
 
         // Load initial data with Kotlin repositories only if it's a fresh start
         if (savedInstanceState == null) {
-            viewModel.searchRepositories("language:kotlin")
+            viewModel.searchRepositories("kotlin")
         }
     }
 
@@ -72,11 +71,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 newText?.let {
-                    if (it.isNotEmpty()) {
-                        observeLocalRepositorySearch(it)
-                    } else {
-                        observeAllRepositories()
-                    }
+                    viewModel.refreshRepositories(it)
                 }
                 return true
             }
@@ -102,10 +97,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Sets up all observers for LiveData objects from ViewModel
+     * Sets up all observers for LiveData objects from ViewModel.
+     * A single repository observer is created that stays active throughout the app lifecycle.
      */
     private fun setupObservers() {
-        observeAllRepositories()
+        // Set up a single observer for repositories that stays active throughout the app lifecycle
+        viewModel.repositories.observe(this) { repos ->
+            adapter.submitList(repos)
+            binding.emptyView.visibility = if (repos?.isEmpty() == true) View.VISIBLE else View.GONE
+        }
 
         viewModel.isLoading.observe(this) { isLoading ->
             binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
@@ -119,26 +119,4 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Observes LiveData from the ViewModel to update the UI when data changes.
-     */
-    private fun observeAllRepositories() {
-        viewModel.repositories.observe(this) { repos ->
-            adapter.submitList(repos)
-            binding.emptyView.visibility = if (repos.isEmpty()) View.VISIBLE else View.GONE
-        }
-    }
-
-    /**
-     * Observes local repository search results based on the provided query.
-     * Updates the UI with filtered repository data.
-     *
-     * @param query The search query string to filter repositories by
-     */
-    private fun observeLocalRepositorySearch(query: String) {
-        viewModel.searchLocalRepositories(query).observe(this) { repos ->
-            adapter.submitList(repos)
-            binding.emptyView.visibility = if (repos.isEmpty()) View.VISIBLE else View.GONE
-        }
-    }
 }

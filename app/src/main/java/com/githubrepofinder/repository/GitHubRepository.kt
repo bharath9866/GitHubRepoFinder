@@ -39,6 +39,21 @@ class GitHubRepository(
     }
 
     /**
+     * Gets repositories with appropriate filtering based on query.
+     * Simplifies viewModel by handling query logic in repository layer.
+     *
+     * @param query The search term to filter repositories (empty string returns all)
+     * @return LiveData object containing filtered or all GitHub repositories
+     */
+    fun getRepositories(query: String?): LiveData<List<GHRepo>> {
+        return if (query.isNullOrEmpty()) {
+            getAllRepositories()
+        } else {
+            searchLocalRepositories(query)
+        }
+    }
+
+    /**
      * Refreshes repositories by fetching new data from the network and updating cache.
      * 
      * @param query The search term to fetch repositories from network
